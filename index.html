@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔎 Investigação DB | Nível Visão</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔎</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        senaiBlue: '#164194', senaiBlueHover: '#103070', senaiOrange: '#F39200', senaiOrangeHover: '#D98200',
+                        senaiMedBlue: '#007DC5', senaiLightBlue: '#00A9E0', senaiYellow: '#FFCD00', senaiGray: '#58595B',
+                        bgLight: '#f8fafc', surfaceLight: '#ffffff', textLight: '#1e293b',
+                        bgDark: '#0f172a', surfaceDark: '#1e293b', textDark: '#f8fafc', textMutedDark: '#94a3b8',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; overflow: hidden; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        
+        .chat-bubble { animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: scale(0.95); transform-origin: top left; }
+        .chat-bubble.user { transform-origin: top right; }
+        @keyframes popIn { to { opacity: 1; transform: scale(1); } }
+
+        .typing span { display: inline-block; width: 6px; height: 6px; border-radius: 50%; opacity: 0.6; animation: blink 1.4s infinite both; }
+        .typing span:nth-child(1) { animation-delay: -0.32s; }
+        .typing span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes blink { 0%, 80%, 100% { transform: scale(0); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+
+        .toast-enter { animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .chat-background-light { background-color: #f1f5f9; background-image: radial-gradient(#cbd5e1 1px, transparent 1.5px); background-size: 20px 20px; }
+        .chat-background-dark { background-color: #0f172a; background-image: radial-gradient(#1e293b 1px, transparent 1.5px); background-size: 20px 20px; }
+    </style>
+</head>
+<body class="bg-bgLight dark:bg-bgDark text-textLight dark:text-textDark h-screen w-screen flex antialiased transition-colors duration-300">
+    
+    <div id="tutorial-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 transition-opacity duration-300">
+        <div class="bg-surfaceLight dark:bg-surfaceDark border border-slate-200 dark:border-slate-700 p-8 rounded-2xl max-w-xl shadow-2xl relative">
+            <div class="flex justify-center mb-6">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQX6eWy0cVttWnmzM5__oF6hBKo82hiTs6KXJz-1Nqm6_lbbzTfaA0Q5zBL&s=10" alt="SENAI" class="h-10 object-contain drop-shadow">
+            </div>
+            
+            <h2 class="text-2xl font-bold text-center mb-3">Missão: O Nível Externo (Visão)</h2>
+            <div class="text-slate-600 dark:text-slate-300 leading-relaxed text-[15px] mb-5 text-center">
+                Sua missão como DBA é ir a campo e estruturar a realidade caótica do cliente antes de desenhar qualquer Banco de Dados!
+            </div>
+            
+            <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-5 rounded-xl text-sm mb-6">
+                <p class="font-bold text-senaiBlue dark:text-senaiLightBlue mb-4 uppercase tracking-wide text-[11px]">Passo a Passo da Atividade:</p>
+                <ul class="list-none space-y-4">
+                    <li class="flex gap-3 items-start text-slate-700 dark:text-slate-300">
+                        <span class="bg-senaiOrange/20 text-senaiOrange rounded flex items-center justify-center font-bold px-2 py-0.5 mt-0.5 shrink-0">1</span>
+                        <span><strong>Interrogue o Cliente e Peça Provas Físicas:</strong> Você não fará suposições. Pergunte com agir sem jargões e <strong>implore por uma foto</strong> ou prova física de como a anotação manual deles realmente é.</span>
+                    </li>
+                    <li class="flex gap-3 items-start text-slate-700 dark:text-slate-300">
+                        <span class="bg-senaiOrange/20 text-senaiOrange rounded flex items-center justify-center font-bold px-2 py-0.5 mt-0.5 shrink-0">2</span>
+                        <span><strong>Desbloqueio do Digital:</strong> O sistema SENAI bloqueará a sua Planilha digital do cliente até você analisar criticamente as anotações grosseiras enviadas na evidência manual primeira!</span>
+                    </li>
+                    <li class="flex gap-3 items-start text-slate-700 dark:text-slate-300">
+                        <span class="bg-senaiOrange/20 text-senaiOrange rounded flex items-center justify-center font-bold px-2 py-0.5 mt-0.5 shrink-0">3</span>
+                        <span><strong>Sua Estruturação:</strong> Com a foto da evidência e o CSV que desbloqueados, pegue papel/planilha na vida real e classifique os Registros Caóticos nas Tabelas limpas finais do Sistema.</span>
+                    </li>
+                </ul>
+            </div>
+            <button onclick="closeTutorial()" class="w-full bg-senaiBlue hover:bg-senaiBlueHover text-white font-bold py-3.5 rounded-xl transition-all shadow-lg text-base uppercase tracking-wide">Aceitar Investigação</button>
+        </div>
+    </div>
+
+
+
+    <div id="manual-modal" class="fixed inset-0 z-[100] items-center justify-center bg-black/60 backdrop-blur-sm px-4 transition-opacity duration-300 hidden">
+        <div class="bg-surfaceLight dark:bg-surfaceDark border border-slate-200 dark:border-slate-700 p-8 rounded-2xl max-w-lg shadow-2xl relative">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="text-senaiOrange text-2xl">📘</span> Guia de Investigação</h2>
+            <div class="text-slate-600 dark:text-slate-300 text-sm space-y-4 font-medium leading-relaxed mb-6">
+                <p>Nesta fase de levantamento de requisitos (<strong class="text-senaiBlue dark:text-senaiLightBlue">Nível Visão</strong>), não seja um analista passivo!</p>
+                <div class="bg-senaiLightBlue/10 border-l-4 border-senaiLightBlue p-3 rounded-r">
+                    🚫 <strong>Zero Jargão:</strong> Fale SQL, Tabelas, Primary Key com o cliente e ele bloqueará a entrevista pois as classes confundem. Fale com a linguagem do balcão da loja.
+                </div>
+                <h3 class="font-bold text-senaiBlue dark:text-senaiLightBlue mt-4 mb-2 uppercase text-xs tracking-widest">📸 Análise de Documentos Históricos:</h3>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li>O cliente mentiu ou esqueceu algo no Chat? Mande a regra de prata: <strong class="text-slate-800 dark:text-white">"Me mostre uma foto da folha/tela"</strong>.</li>
+                    <li>Sempre verifique Evidências Ocultas que sobem na imagem do rascunho. As vezes eles agrupam Peso e Geração em fofocas e isso arruina Banco de Dados!</li>
+                </ul>
+            </div>
+            <button onclick="closeManual()" class="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-bold py-3 rounded-xl transition-all">Manter Foco na Investigação</button>
+        </div>
+    </div>
+
+    <div id="evidence-modal" class="fixed inset-0 z-[110] items-center justify-center bg-black/90 backdrop-blur-md px-4 transition-all hidden">
+        <div class="relative w-full max-w-2xl flex flex-col items-center">
+            <button onclick="closeEvidence()" class="absolute -top-12 right-0 text-white hover:text-senaiOrange text-sm font-bold bg-white/20 p-2 rounded px-4 transition">✕ FECHAR PROVA FÍSICA</button>
+            <div id="evidence-container" class="w-full flex justify-center dropshadow-2xl">
+            </div>
+            <p class="text-white/60 text-center text-xs mt-4 uppercase tracking-widest">Digitalização fotográfica do Histórico do Usuário recuperada com sucesso.</p>
+        </div>
+    </div>
+
+    <div id="professor-toast" class="fixed bottom-6 right-6 z-[90] bg-senaiBlue text-white p-5 rounded-2xl shadow-2xl flex max-w-[340px] hidden border-l-4 border-senaiOrange items-start gap-4">
+        <div class="text-3xl shrink-0">👩‍🏫</div>
+        <div>
+           <h4 class="font-bold text-xs mb-1 text-senaiYellow uppercase tracking-widest">Instrutora SENAI</h4>
+           <p id="professor-toast-text" class="text-sm font-medium leading-relaxed"></p>
+        </div>
+        <button onclick="closeToast()" class="absolute top-2 right-2 text-white/50 hover:text-white">✕</button>
+    </div>
+
+    <aside class="w-full md:w-[320px] lg:w-[360px] bg-surfaceLight dark:bg-surfaceDark border-r border-slate-200 dark:border-slate-700 flex flex-col shrink-0 z-20 h-full">
+        <div class="p-6 border-b border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-900/40">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQX6eWy0cVttWnmzM5__oF6hBKo82hiTs6KXJz-1Nqm6_lbbzTfaA0Q5zBL&s=10" alt="SENAI" class="h-8 mb-5 object-contain">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-lg font-bold text-slate-800 dark:text-white tracking-tight">Investigação DBA</h1>
+                <button onclick="showProfessorTip()" class="bg-senaiOrange/10 hover:bg-senaiOrange/20 text-senaiOrange transition-colors px-3 py-1.5 rounded text-xs font-bold flex items-center border border-senaiOrange/30 shadow-sm">
+                   Dica
+                </button>
+            </div>
+        </div>
+        <div class="p-4 pb-1"><h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Contatos Empresariais</h3></div>
+        <div class="flex-1 overflow-y-auto px-4 space-y-3 pb-6 scrollbar-hide" id="client-list"></div>
+    </aside>
+
+    <main class="flex-1 flex flex-col relative h-screen z-10 w-full" id="main-area">
+        <header class="h-[72px] bg-white/90 dark:bg-surfaceDark/95 backdrop-blur border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 z-20 shrink-0 shadow-sm">
+            <div class="flex items-center gap-3 hidden" id="chat-header-info">
+                <div class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 shrink-0">
+                    <img id="active-avatar" src="" alt="Avatar" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h2 id="active-name" class="font-bold text-slate-800 dark:text-white text-[15px] leading-tight">Cliente</h2>
+                    <p id="active-role" class="text-[11px] text-slate-500 font-medium tracking-wide"></p>
+                </div>
+            </div>
+            
+            <div class="flex-1"></div>
+
+            <div class="flex items-center gap-3 ml-auto">
+                <a href="guia.html" target="_blank" class="px-3 py-2 bg-amber-100 dark:bg-amber-900/40 text-amber-800 border border-amber-300 dark:border-amber-700/50 dark:text-amber-400 text-xs font-bold rounded-xl transition shadow-sm ml-2 hidden sm:flex items-center gap-2 hover:bg-amber-200 dark:hover:bg-amber-900/60">🎓 <span class="hidden md:inline">Central de</span> Apoio</a>
+                <div class="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1"></div>
+                <button id="download-btn" class="hidden px-4 py-2 bg-senaiMedBlue hover:bg-senaiBlue text-white text-xs font-bold rounded shadow transition-all flex items-center gap-2 mr-2 animate-pulse whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Acessar Tabela Digital Suja 🔓
+                </button>
+                <div class="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2" id="nav-divider"></div>
+                <button onclick="openManual()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold rounded transition border border-slate-300 dark:border-slate-600 whitespace-nowrap">Instruções</button>
+                <a href="guia.html" target="_blank" class="px-3 py-2 bg-senaiOrange hover:bg-senaiOrangeHover text-white text-xs font-bold rounded transition shadow whitespace-nowrap">Guia Mapa</a>
+                <button onclick="toggleTheme()" id="theme-toggle" class="p-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 rounded text-sm transition border border-slate-300 dark:border-slate-600 text-center w-10">☀️</button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-4 relative chat-background-light dark:chat-background-dark transition-colors duration-300" id="chat-messages">
+            <div class="m-auto text-center opacity-90 bg-white dark:bg-slate-800/90 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 max-w-md shadow-lg" id="empty-state">
+                <div class="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🔎</div>
+                <h3 class="text-slate-800 dark:text-white font-bold text-lg mb-2">Engenharia Reversa</h3>
+                <p class="text-slate-500 dark:text-slate-400 font-medium text-[13px] leading-relaxed">Inicie o contato com os gestores empresariais na esquerda. Force-os a exibir a maneira real e precária de controle deles para liberar o Arquivo Lógico (CSV)!</p>
+            </div>
+        </div>
+
+        <div id="chat-footer" class="bg-white dark:bg-surfaceDark border-t border-slate-200 dark:border-slate-700 p-4 transition-all opacity-50 pointer-events-none z-20 w-full flex flex-col gap-3 shrink-0">
+            <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide w-full max-w-4xl mx-auto" id="suggestions-container">
+                <button class="sug-btn shrink-0 text-[13px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900 border border-amber-300 dark:border-amber-700/50 px-4 py-2 rounded-lg transition-colors shadow-sm whitespace-nowrap">📸 Pode me mostrar uma foto de como anota?</button>
+                <button class="sug-btn shrink-0 text-xs font-semibold bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 transition-colors whitespace-nowrap">Quais os dados mais cruciais que anota do cliente?</button>
+                <button class="sug-btn shrink-0 text-xs font-semibold bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 transition-colors whitespace-nowrap">Gostaria de saber seu lucro no dia a dia.</button>
+            </div>
+            
+            <form id="chat-form" class="flex gap-3 max-w-4xl mx-auto w-full items-center">
+                <input type="text" id="chat-input" placeholder="Faça inquéritos e descubra a foto do controle real deles..." autocomplete="off" class="flex-1 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-senaiBlue dark:focus:border-senaiLightBlue transition-all text-[14px]">
+                <button type="submit" class="w-12 h-12 bg-senaiBlue hover:bg-senaiBlueHover text-white rounded-xl flex items-center justify-center shadow shrink-0 active:scale-95 transition-transform">
+                    <svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const themeBtn = document.getElementById('theme-toggle');
+        function initTheme() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark'); themeBtn.textContent = '☀️';
+            } else { document.documentElement.classList.remove('dark'); themeBtn.textContent = '🌙'; }
+        }
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark'); localStorage.theme = 'light'; themeBtn.textContent = '🌙';
+            } else { document.documentElement.classList.add('dark'); localStorage.theme = 'dark'; themeBtn.textContent = '☀️'; }
+        }
+        initTheme();
+
+        function closeTutorial() { document.getElementById('tutorial-modal').classList.add('hidden'); }
+        function openManual() { document.getElementById('manual-modal').classList.remove('hidden'); document.getElementById('manual-modal').classList.add('flex'); }
+        function closeManual() { document.getElementById('manual-modal').classList.add('hidden'); document.getElementById('manual-modal').classList.remove('flex'); }
+        function closeToast() { document.getElementById('professor-toast').classList.add('hidden'); document.getElementById('professor-toast').classList.remove('toast-enter'); }
+        
+
+
+        const EVIDENCE_HTML = {
+            genival: '<img src="imagens/genival.png" class="w-full h-auto rounded-xl shadow-2xl border-4 border-slate-700 object-contain max-h-[85vh]">',
+            jessica: '<img src="imagens/beatriz.png" class="w-full h-auto rounded-xl shadow-2xl border-4 border-slate-700 object-contain max-h-[85vh]">',
+            clovis: '<img src="imagens/clovis.png" class="w-full h-auto rounded-xl shadow-2xl border-4 border-slate-700 object-contain max-h-[85vh]">',
+            cida: '<img src="imagens/cida.png" class="w-full h-auto rounded-xl shadow-2xl border-4 border-slate-700 object-contain max-h-[85vh]">',
+            marcao: '<img src="imagens/marcao.png" class="w-full h-auto rounded-xl shadow-2xl border-4 border-slate-700 object-contain max-h-[85vh]">',
+            sonia: '<img src="imagens/sonia.png" class="w-full h-auto rounded-xl shadow-2xl border-4 border-slate-700 object-contain max-h-[85vh]">'
+        };
+
+        const DB = [
+            { id: 'genival', name: 'Seu Genival', role: 'Mercadinho de Bairro', seed: 'EduardoGrandpa',
+              greeting: 'Boa tarde! Vai querer anotar o pão na caderneta?',
+              keywords: [
+                  { words: ['foto', 'caderno', 'controle', 'anotava', 'papel', 'prova', 'evidencia', 'mostrar', 'ver'], response: "Tá bem. Tirei uma foto da capa do meu caderno onde risco as despesas em cima do balcão. Vê aí.", isEv: true }
+              ], defaultResponse: "Isso aí eu não entendi, tá muito confuso na sua fala. Fala sobre o balanço de compras.",
+              hints: ["Neste cenário do Mercadinho, você gerará 2 Tabelas principais.", "A tabela de Cliente deve ter 2 ou 3 atributos apenas.", "As tabelas que serão geradas são baseadas em Clientes e o Histórico de Vendas."]
+            },
+            { id: 'jessica', name: 'Dra. Jéssica', role: 'Clínica Veterinária', seed: 'Valeria',
+              greeting: 'Olá. A recepção está um pouco agitada com os cães. Precisa verificar algum histórico clínico?',
+              keywords: [
+                  { words: ['foto', 'ficha', 'prontuario', 'controle', 'anotava', 'papel', 'prova', 'evidencia', 'mostrar', 'ver'], response: "Separei o Prontuário 891 do Pug do Sr. Carlos. Veja as anotações.", isEv: true }
+              ], defaultResponse: "Não compreendi a sua solicitação clínica. Seja específico.",
+              hints: ["Na Clínica Veterinária, prepare-se para extrair 3 Tabelas Diferentes.", "A tabela principal de Consultas pode chegar a 4 ou 5 atributos.", "As tabelas geradas devem isolar o Dono, o Cachorro e a Consulta Clínica."]
+            },
+            { id: 'clovis', name: 'Sr. Clóvis', role: 'Relojoaria Antiga', seed: 'RobertOld',
+              greeting: 'Boa tarde. As engrenagens estão desgastadas, preciso acompanhar consertos das garantias.',
+              keywords: [
+                  { words: ['foto', 'caderno', 'controle', 'anotava', 'papel', 'prova', 'evidencia', 'mostrar', 'ver'], response: "Vou exibir um croqui que fiz no meu caderno de campo onde junto as garantias.", isEv: true }
+              ], defaultResponse: "Não desvie o assunto. O problema aqui é o modelo do relógio e as peças diminutas associadas.",
+              hints: ["No balcão de Relojoaria, o negócio se divide em 3 Tabelas.", "A Tabela do Estoque de Engrenagens é isolada das Ocorrências.", "Gerencie as garantias através de IDs!"]
+            },
+            { id: 'cida', name: 'Dona Cida', role: 'Ateliê de Costura', seed: 'MariaGrandma',
+              greeting: 'Olá, procurava algum ajuste longo em bainha hoje?',
+              keywords: [
+                  { words: ['foto', 'caderno', 'controle', 'anotava', 'papel', 'prova', 'evidencia', 'mostrar', 'ver'], response: "Separei o bloquinho de anotações pra você. Tirei uma foto e anexei.", isEv: true }
+              ], defaultResponse: "Isso não faz sentido pro ateliê. Tente voltar o assunto para costuras e panos.",
+              hints: ["No Ateliê de Costura, procure extrair 2 Tabelas fixas.", "A Tabela do Cliente conterá umas 4 colunas exclusivas de medidas corporais.", "As tabelas principais que gerarão são: Dados Geométricos da Cliente e as Vendas Têxteis efetuadas."]
+            },
+            { id: 'marcao', name: 'Marcão', role: 'Oficina Mecânica', seed: 'GeorgeMec',
+              greeting: 'Bom dia. Qual é o reparo da suspensão pendente pra hoje?',
+              keywords: [
+                  { words: ['foto', 'papelao', 'ordem', 'servico', 'controle', 'anotava', 'papel', 'prova', 'evidencia', 'mostrar', 'ver'], response: "Peguei a OS presa naquele painel manual e registrei pra você ver a disposição de dados.", isEv: true }
+              ], defaultResponse: "Muito termo técnico, não entendi. Pergunta sobre o óleo de freio ou peça velha que eu explico.",
+              hints: ["Na Oficina, o fluxo demandará a concepção de 2 Tabelas vitais.", "Sua tabela de Serviços/Manutenção baterá perto de 4 a 5 Atributos financeiros.", "Você está buscando gerar Tabelas que dividam o Veículo físico do Custo e Ordem de Serviço prestada."]
+            },
+            { id: 'sonia', name: 'Dona Sônia', role: 'Buffet de Eventos', seed: 'SoniaOldLady',
+              greeting: 'Olá! Estou organizando duas festas enormes. Tudo se molhou e a agenda perdeu sentido! Socorro!',
+              keywords: [
+                  { words: ['foto', 'agenda', 'mancha', 'borrado', 'prova', 'evidencia', 'mostrar', 'ver', 'agua'], response: "Tirei uma foto da minha agenda borrada. Veja como está terrível de identificar o aluguel dos pratos! Dói no coração.", isEv: true }
+              ], defaultResponse: "Meu tempo é curto. Não complique os termos porque preciso voltar a alocar as faqueiras, a sexta-feira será lotada e tudo está atrasado.",
+              hints: ["No Buffet, o problema é o sobre-aluguel (Conflito de datas)", "Você testará gerar Tabelas para: Evento, Locação, e Cliente que locou.", "O foco será criar IDs de Reserva e IDs de Item de Baixela."]
+            }
+        ];
+
+        let activeClient = null;
+        const clientListEl = document.getElementById('client-list');
+        const chatMessagesEl = document.getElementById('chat-messages');
+
+        function init() {
+            renderClientList();
+            document.getElementById('chat-form').addEventListener('submit', (e) => { e.preventDefault(); processInput(document.getElementById('chat-input').value.trim()); });
+            document.getElementById('download-btn').addEventListener('click', () => { if(activeClient) downloadCSV(activeClient.csvLines, `Nivel_Visao_${activeClient.name.replace(/ /g, '_')}.csv`); });
+            document.querySelectorAll('.sug-btn').forEach(btn => btn.addEventListener('click', (e) => processInput(e.target.textContent)));
+        }
+
+        DB[0].csvLines = [
+"Data da Anotacao,Nome Fregues e Bairro,Levou o Que,Preco Devido,O q eu percebi",
+"12/04/2026,Maria Claudia (Centro),Arroz Tio Joao,30.00,Paga na sexta",
+"12/04/2026,Jose Silva (Vila Nova),Arroz T. Joao,30.00,Pediu rapido",
+"13/04/2026,Carlos Eduardo (Centro),Feijao Preto,15.50,Esqueceu o cartao",
+"13/04/2026,Betina Martins (Ipiranga),Arroz 5kg,30.00,Cachorro latindo muito",
+"14/04/2026,Rita Lee (Vila Nova),Manteiga,12.00,Trouxe notas velhas",
+"14/04/2026,Jose Silva (Vila Nova),Pao Frances,5.50,Veio sozinho",
+"15/04/2026,Maria Claudia (Centro),Leite Integral,7.50,Chovendo",
+"15/04/2026,Marcos Paulo (Oeste),Pao Frances,5.50,Com pressa",
+"16/04/2026,Betina Martins (Ipiranga),Trigo Dona Benta,6.00,-",
+"16/04/2026,Joao Santos (Sul),Arroz T Joao,30.00,Muito gentil",
+"17/04/2026,Rita Lee (Vila Nova),Leite de Vaca,7.50,Ligou antes",
+"17/04/2026,Carlos Eduardo (Centro),Manteiga,12.00,Queria margarina e nao tinha",
+"18/04/2026,Jose Silva (Vila Nova),Biscoito,4.00,Com o neto",
+"18/04/2026,Maria Claudia (Centro),Biscoito,4.00,Cansada",
+"19/04/2026,Marcos Paulo (Oeste),Trigo,6.00,Vai fazer pneu",
+"19/04/2026,Joao Santos (Sul),Feijao Preto,15.50,-",
+"20/04/2026,Helena (Centro),Leite Caxinha,7.50,Chovendo bastante",
+"20/04/2026,Helena (Centro),Biscoito,4.00,Vento frio",
+"21/04/2026,Jose Silva (Vila Nova),Arroz 5kilos,30.00,Esqueceu a senha",
+"21/04/2026,Maria Claudia (Centro),Sabonete,3.50,Urgencia"
+        ];
+        DB[1].csvLines = [
+"Data da Chegada,Nome Bicho e Tutor,Raca e Cor,Contato,Desfecho",
+"10/05/2026,Thor (Dono: Carlos),Bulldog Preto,Tel: 9911-0000,Vacina Antirrabica",
+"10/05/2026,Mel (Dona: Julia),Poodle Branca,Tel: 9922-1111,Corte de unhas",
+"11/05/2026,Bidu (Dono: Marcos),Pug Amarelo,Tel: 9933-2222,Tosse cronica xarope",
+"11/05/2026,Thor (Dono: Roberto),Pastor Alemao,Tel: 9944-3333,Banho e tosa",
+"12/05/2026,Simba (Dona: Carla),Gato Persa,Tel: 9955-4444,Remedio verme",
+"12/05/2026,Max (Dono: Pedro),Labrador Dourado,Tel: 9966-5555,Vacina virose",
+"13/05/2026,Mel (Dono: Antonio),Vira-lata Caramelo,Tel: 9977-6666,Mordida na perna costurou",
+"13/05/2026,Toto (Dona: Beatriz),Maltes Branco,Tel: 9988-7777,Olho remelando limpo",
+"14/05/2026,Thor (Dono: Carlos),Bulldog P.,Tel: 9911-0000,Manutencao banho",
+"14/05/2026,Luna (Dona: Maria),Husky Cinza,Tel: 9999-8888,Fugiu banho extra",
+"14/05/2026,Bob (Dono: Joao),Shih Tzu,Tel: 9900-9999,Tosa higienica",
+"15/05/2026,Mel (Dona: Julia),Poodle Branca,Tel: 9922-1111,Vacina alergia",
+"15/05/2026,Nina (Dono: Marcos),Gato Siames,Tel: 9933-2222,Checape",
+"16/05/2026,Thor (Dono: Jorge),Golden Retriever,Tel: 9912-3456,Revisao ortopedica",
+"16/05/2026,Bidu (Dono: Marcos),Pug Amarelinho,Tel: 9933-2222,Tosse melhorou muito",
+"17/05/2026,Simba (Dona: Carla),Gato P.,Tel: 9955-4444,Unha cortada",
+"17/05/2026,Bolinha (Dono: Zeca),Pinscher,Tel: 9987-6543,Tremedeira intensa soro",
+"18/05/2026,Max (Dono: Pedro),Labrador Ouro,Tel: 9966-5555,Dores articulares rx",
+"18/05/2026,Thor (Dono: Roberto),Pastor Misto,Tel: 9944-3333,Vacina repete",
+"19/05/2026,Mel (Dono: Antonio),Vira lata Cara.,Tel: 9977-6666,Tirou os pontos"
+        ];
+        DB[2].csvLines = [
+"Data Manutencao,Modelo Relogio (Ciente),Peca Utilizada(Garantia?),Preco Cobrado,O que Aconteceu",
+"01/06/2026,Omega Seamaster (Sr. Joao),Engrenagem B - Comum,250.00,Parou de bater",
+"01/06/2026,Rolex Sub (Arthur),Pino Lateral (GARANTIA),0.00,Pino estava frouxo",
+"02/06/2026,Orient Azul (Mariana),Engrenagem B (Comum),150.00,Atrasando 5 min",
+"02/06/2026,Omega Seamaster (Ricardo),Coroa Original,90.00,Coroa solta",
+"03/06/2026,Seiko Classico (Sr. Joao),Mola Central,25.00,Vidro quebrado antes",
+"03/06/2026,Casio Edifice (Pedro),Pilha 23A,40.00,Nao liga mais",
+"04/06/2026,Rolex Sub (Amanda),Engrenagem A (Premium),120.00,Relogio molhou",
+"04/06/2026,Orient Prata (Sr. Joao),Pino Lateral,15.00,Ajuste de pulseira",
+"05/06/2026,Omega Seamaster (Julio),Engrenagem B Comum,250.00,Garantia anterior falhou",
+"05/06/2026,Rolex Sub (Arthur),Mola Central,35.00,Barulho estranho interno",
+"06/06/2026,Seiko Classico (Mariana),Pino Lateral (Garantia),0.00,Caiu no chao e quebrou",
+"06/06/2026,Orient Azul (Ricardo),Pilha 23A,25.00,Ponteiro solto",
+"07/06/2026,Casio Edifice (Joao Marcos),Engrenagem C (Maior),45.00,Atraso cronico de meses",
+"07/06/2026,Relogio Parede (Amanda),Pilha 12A (Dupla),80.00,Barulho chato de noite",
+"08/06/2026,Omega Dourado (Pedro),Coroa Original (Pequena),220.00,Agua dentro",
+"08/06/2026,Seiko Classico (Sr. Joao),Engrenagem B comum,100.00,Devolvido com riscos",
+"09/06/2026,Rolex Falso (Ricardo),Mola Central (Imitacao),10.00,Nao sei arrumar",
+"09/06/2026,Casio Prata (Arthur),Pino Lateral,15.00,Pulseira soltando",
+"10/06/2026,Omega Seamaster (Beatriz),Engrenagem A (Premium),155.00,Ponteiro quebrado",
+"10/06/2026,Orient Quartz (Mariana),Engrenagem C maior,90.00,Motor falhando"
+        ];
+        DB[3].csvLines = [
+"Dia Entregue,Dona e Medidas,Trabalho Feito na Peca,O q a Peca Eh,Total Reais",
+"02/07/2026,Leticia R. (80cm/90cm),Ajustar Cintura,Vestido Azul,50.00",
+"02/07/2026,Marta S. (M),Lavar Sujeira Forte,Edredom,45.00",
+"03/07/2026,Camila J. (75cm/85cm),Fazer Bainha Lisa,Calca Jeans,20.00",
+"03/07/2026,Roberta T. (G),Passar Tudo,Camisa Social x5,35.00",
+"04/07/2026,Leticia R. (80cm/90cm),Lavar a seco,Casaco Inverno,60.00",
+"04/07/2026,Joana D. (GG),Ajustar Ombro,Blusa de Frio,40.00",
+"05/07/2026,Silvia P. (P),Passar Roupas,Vestido de Festa,25.00",
+"05/07/2026,Camila J. (75cm/85cm),Ajustar Barra Velha,Calca Sarja,20.00",
+"06/07/2026,Marta S. (M),Lavar Cheiro de Caco,Tapete Pequeno,55.00",
+"06/07/2026,Clara B. (PP),Diminuir Altura,Saia Curta,30.00",
+"07/07/2026,Roberta T. (G),Lavar,Camisa Branca x3,25.00",
+"07/07/2026,Leticia R. (80/90),Passar pro Fds,Conjunto Social,40.00",
+"08/07/2026,Joana D. (GG),Lavar Sangue,Lencol Branco,35.00",
+"08/07/2026,Silvia P. (P),Costurar Buraco Feio,Bermuda P,15.00",
+"09/07/2026,Marta S. (M),Ajustar Cintura Grossa,Calca Alfaiate,30.00",
+"09/07/2026,Camila J. (75/85),Lavar Normal,Cortina Sala,70.00",
+"10/07/2026,Clara B. (PP),Passar Tudo,Vestido Leve,15.00",
+"10/07/2026,Leticia R. (80/90),Diminuir Mangas,Camisa Seda,45.00",
+"11/07/2026,Roberta T. (G),Lavar,Cobertor Casal,50.00",
+"11/07/2026,Silvia P. (P),Fazer Bainha Rapida,Vestido Longo,25.00"
+        ];
+        DB[4].csvLines = [
+"Carro_Modelo_Placa,Trabalho_Grave,Peca_Usada_Ou_Limpeza,Reais_Gastos,Fofoca",
+"Gol Branco (ABC-1234),Motor vazando,Filtro de Oleo (Peca),45.00,Parei comer marmita",
+"Gol Branco (ABC-1234),Motor vazando,Mao de Obra (Troca do Filtro),100.00,Jogo do corinthians",
+"Palio Prata (XYZ-9876),Freio cantando muito,Pastilha de Freio Jogo (Peca),120.00,Solzao rachando",
+"Palio Prata (XYZ-9876),Freio cantando muito,Mao de Obra (Troca Pastilha),80.00,Tomando refri",
+"Civic Preto (QWE-1122),Suspensao batendo,Amortecedor Tras (Peca),350.00,-",
+"Civic Preto (QWE-1122),Suspensao batendo,Mao de Obra Suspensao,200.00,-",
+"Uno Mille (ASD-3344),Nao liga bateria,Bateria Moura 60Ah (Peca),400.00,Cliente bravo",
+"Uno Mille (ASD-3344),Nao liga bateria,Mao de Obra Bateria M,50.00,Cliente bravo msm",
+"Fiesta Verm (ZXC-5566),Luz da injeção acesa,Scanner limpeza (Servico),150.00,Futebol na tv",
+"Gol Branco (ABC-1234),Pneu furado rasgado,Pneu Aro 14 (Peca),280.00,Maluco bateu na guia",
+"Gol Branco (ABC-1234),Pneu furado rasgado,Mao de Obra Borracharia,40.00,-",
+"Corolla Azul (RTY-7788),Arruela do carter,Arruela Simples (Peca),5.00,Calor de matar",
+"Corolla Azul (RTY-7788),Arruela do carter,Mao de Obra Troca Oleo,50.00,Bebi guarana",
+"Palio Prata (XYZ-9876),Oleo ta velho,Oleo 15w40 4L (Peca),140.00,Trocar antes de viajar",
+"Civic Preto (QWE-1122),Correia roncando,Correia Dentada (Peca),180.00,-",
+"Civic Preto (QWE-1122),Correia roncando,Mao de Obra da Correia,250.00,-",
+"Saveiro Prata (UIO-9900),Vidro nao sobe,Maquina de Vidro E (Peca),90.00,Roubaram o som dele",
+"Saveiro Prata (UIO-9900),Vidro nao sobe,Mao de Obra Eletrica,100.00,-",
+"Hb20 Branco (FGH-3456),Cheiro de gasolina,Filtro Combustivel (Peca),35.00,Dono estranho",
+"Hb20 Branco (FGH-3456),Cheiro de gasolina,Mao de Obra Combustivel,60.00,Dono ignorante"
+        ];
+        DB[5].csvLines = [
+"Data Solicitada,Tipo de Festa do Cliente,Item Emprestado(Locacao),Quantidade,Mesa ou Buffet",
+"15/09/2026,Festa Casamento (Mariana R),Toalha Branca Lisa,20,Foi p Mesa",
+"15/09/2026,Festa Infantil (Sra. Rita),Toalha Branca Lisa,10,Mesa Crianca",
+"15/09/2026,Festa Casamento (Mariana R),Copo Vidro Tulipa,50,Buffet Livre",
+"16/09/2026,Aniversario 15 (Joana D),Faqueiro Prata Completo,15,Mesa de Jantar",
+"16/09/2026,Aniversario 15 (Joana D),Taça Champanhe,40,-",
+"16/09/2026,Festa Casamento (Mariana R),Taça Champanhe,30,Noivos Roubaram",
+"17/09/2026,Formatura Turma A,Prato Sobremesa,100,Buffet Sobremesa",
+"17/09/2026,Festa Casamento (Carlos),Toalha Branca (Manchada),15,Mesa de Canto",
+"18/09/2026,Boteco do Ze,Copo Vidro Tulipa,80,Bar Aberto",
+"18/09/2026,Despedida (Rafael),Faqueiro Aco Inox,20,Churrasco",
+"19/09/2026,Casamento Praia (Luis),Prato Fundo,30,-",
+"20/09/2026,Festa 15 anos (Marcela),Prato Raso Dourado,60,Mesa Fina",
+"20/09/2026,Aniversario 15 (Marcela),Taça de Agua,60,Mesa Fina",
+"21/09/2026,Formatura Turma B,Faqueiro Inox Standard,200,-",
+"21/09/2026,Casamento Sitio (Carla),Copo Whisky,40,-",
+"22/09/2026,Festa Infantil (Aline),Toalha Azul Claro,15,Mesa Doce",
+"22/09/2026,Infantil 10 anos (Aline),Prato Sobremesa (Plastico),50,Doces",
+"23/09/2026,Evento Corporativo (Tech),Mesa Dobravel Madeira,10,Stand",
+"23/09/2026,Evento Corpo (Tech),Cadeira Plastica,40,Publico",
+"24/09/2026,Churrasco Condominio,Churrasqueira Eletrica,2,Area Gourmet"
+        ];
+        DB.forEach(d => { d.hasSeenEvidence = false; });
+
+        function renderClientList() {
+            clientListEl.innerHTML = '';
+            DB.forEach(client => {
+                const btn = document.createElement('div');
+                btn.className = `p-3 rounded-2xl cursor-pointer bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center w-full transition-all hover:bg-slate-50 dark:hover:bg-slate-700/50 shadow-sm client-card client-card-${client.id}`;
+                btn.onclick = () => selectClient(client.id);
+                btn.innerHTML = `
+                    <div class="w-12 h-12 mr-3 bg-slate-100 dark:bg-slate-700 rounded-full border border-slate-300 dark:border-slate-600 overflow-hidden shrink-0"><img src="https://api.dicebear.com/7.x/adventurer/svg?seed=${client.seed}&backgroundColor=transparent" class="w-full h-full object-cover"></div>
+                    <div class="text-left w-full overflow-hidden">
+                        <div class="text-[14px] font-bold text-slate-800 dark:text-white leading-tight mb-0.5 truncate">${client.name}</div>
+                        <div class="text-[11px] text-senaiMedBlue dark:text-senaiLightBlue font-bold tracking-wide truncate">${client.role}</div>
+                    </div>
+                `;
+                clientListEl.appendChild(btn);
+            });
+        }
+
+        function selectClient(id) {
+            activeClient = DB.find(c => c.id === id);
+            document.querySelectorAll('.client-card').forEach(el => { el.classList.remove('active', '!border-senaiBlue', '!dark:border-senaiLightBlue', '!bg-blue-50', '!dark:bg-slate-800/80'); });
+            document.querySelector(`.client-card-${id}`).classList.add('active', '!border-senaiBlue', '!dark:border-senaiLightBlue', '!bg-blue-50', '!dark:bg-slate-800/80');
+            
+            document.getElementById('chat-header-info').classList.remove('hidden');
+            document.getElementById('active-name').textContent = activeClient.name;
+            document.getElementById('active-role').textContent = activeClient.role;
+            document.getElementById('active-avatar').src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${activeClient.seed}&backgroundColor=transparent`;
+            
+            checkEvidenceDigitalState();
+            
+            document.getElementById('chat-footer').classList.remove('opacity-50', 'pointer-events-none');
+            const empty = document.getElementById('empty-state'); if(empty) empty.style.display = 'none';
+            chatMessagesEl.innerHTML = '';
+            addBotMessage({ text: activeClient.greeting, isEv: false });
+        }
+
+        const normalizeText = (text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+        function checkEvidenceDigitalState() {
+            if(activeClient.hasSeenEvidence) {
+                document.getElementById('download-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('download-btn').classList.add('hidden');
+            }
+        }
+
+        function showEvidenceModal() {
+            activeClient.hasSeenEvidence = true;
+            document.getElementById('evidence-modal').classList.remove('hidden');
+            document.getElementById('evidence-modal').classList.add('flex');
+            document.getElementById('evidence-container').innerHTML = EVIDENCE_HTML[activeClient.id];
+            checkEvidenceDigitalState();
+        }
+        function closeEvidence() { document.getElementById('evidence-modal').classList.add('hidden'); document.getElementById('evidence-modal').classList.remove('flex');  }
+
+        function showProfessorTipToast(msg) {
+            const toast = document.getElementById('professor-toast');
+            document.getElementById('professor-toast-text').textContent = msg;
+            toast.classList.remove('hidden'); toast.classList.add('toast-enter');
+            setTimeout(() => { closeToast() }, 9500);
+        }
+        function showProfessorTip() {
+            if(activeClient && activeClient.hints) {
+                showProfessorTipToast(activeClient.hints[Math.floor(Math.random() * activeClient.hints.length)]);
+            } else {
+                showProfessorTipToast("Abra conversa com algum cliente primeiro para eu poder te dar dicas sobre as tabelas dele!");
+            }
+        }
+
+        function processInput(text) {
+            if(!text) return;
+            document.getElementById('chat-input').value = '';
+            addUserMessage(text);
+            
+            const txtL = normalizeText(text);
+            const guessWords = ['tabela', 'coluna', 'separar', 'separado', 'modelo', 'atributo', 'organizar', 'banco', 'bancos', 'dados'];
+            const evWords = ['foto', 'caderno', 'controle', 'anotava', 'papel', 'prova', 'evidencia', 'mostrar', 'ver'];
+            let reqEv = evWords.some(w => txtL.includes(w));
+            
+            if (!activeClient.hasSeenEvidence && guessWords.some(w => txtL.includes(w)) && !reqEv) {
+                showProfessorTipToast("⚠️ Alerta do Sistema: Nível de Investigação Incompleto! Requisite documentos probatórios ou papéis enviando termos na caixa de correio!");
+                showTypingIndicator();
+                setTimeout(() => { removeTypingIndicator(); addBotMessage({text: "🚨 Calma aí! Você já está exigindo uma arquitetura complexa de mim, mas ainda nem visualizou meus protocolos atuais. Solicite provas!", isEv:false}); }, 500);
+                return;
+            }
+
+            const idLockWords = ['nome', 'texto longo', 'nome completo', 'nome inteiro', 'escrever nome', 'cpf e nome na venda', 'repetir'];
+            const tableWords = ['venda', 'vendas', 'atendimento', 'ordem', 'servico', 'compra', 'consulta', 'cliente'];
+            let isIdLock = idLockWords.some(w => txtL.includes(w)) && tableWords.some(w => txtL.includes(w));
+            
+            if (activeClient.hasSeenEvidence && isIdLock && !reqEv) {
+                 showTypingIndicator();
+                 setTimeout(() => { 
+                     removeTypingIndicator(); 
+                     addBotMessage({text: "🚨 Ocorrência Rejeitada. Registros sensíveis requerem identificadores persistentes. Se houver atualização de cadastro telefônico no futuro, forçar a edição manual de dezenas de transações faturadas gerará inconsistência! Adote um Identificador numérico (ID).", isEv:false}); 
+                 }, 400);
+                 return;
+            }
+
+            let respObj = { text: activeClient.defaultResponse, isEv: false };
+            for(let kwObj of activeClient.keywords) {
+                for(let w of kwObj.words.map(xw => normalizeText(xw))) {
+                    if(txtL.includes(w) && w.length > 2) { 
+                        respObj = { text: kwObj.response, isEv: kwObj.isEv }; 
+                        break; 
+                    }
+                }
+                if(respObj.text !== activeClient.defaultResponse) break;
+            }
+            if(reqEv) { respObj = { text: activeClient.keywords[0].response, isEv: activeClient.keywords[0].isEv }; }
+
+            showTypingIndicator();
+            setTimeout(() => { removeTypingIndicator(); addBotMessage(respObj); }, 600 + Math.random() * 400);
+        }
+
+        function addUserMessage(text) {
+            const wrapper = document.createElement('div'); wrapper.className = `flex w-full justify-end mb-4`;
+            wrapper.innerHTML = `<div class="max-w-[85%] md:max-w-[70%] rounded-[18px] rounded-tr-sm px-4 py-3 bg-senaiMedBlue text-white shadow-sm text-[14px] leading-relaxed chat-bubble user">${escapeHTML(text)}</div>`;
+            chatMessagesEl.appendChild(wrapper); chatMessagesEl.scrollTo({top: 9999, behavior: 'smooth'});
+        }
+
+        function addBotMessage(obj) {
+            const isError = obj.text.startsWith("🚨");
+            let htmlContent = escapeHTML(obj.text);
+            if (obj.isEv) {
+                let btnTxt = !activeClient.hasSeenEvidence ? "📸 Visualizar Documento (Abrir Investigação)" : "📸 Revisar Prova Física";
+                let pulseClass = !activeClient.hasSeenEvidence ? "animate-pulse ring-2 ring-amber-500 ring-offset-2 dark:ring-offset-slate-800" : "";
+                htmlContent += `<div class="mt-4 border-t border-slate-300 dark:border-slate-600 pt-4 pb-1"><button onclick="showEvidenceModal()" class="w-full px-4 py-3 bg-senaiOrange hover:bg-senaiOrangeHover text-white text-[13px] font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 ${pulseClass}">${btnTxt}</button></div>`;
+            }
+
+            const wrapper = document.createElement('div'); wrapper.className = `flex w-full justify-start mb-6 items-end`;
+            wrapper.innerHTML = `
+                <div class="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 mr-2 border border-slate-300 dark:border-slate-600 overflow-hidden shadow-sm shrink-0">
+                    <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=${isError ? 'Error' : activeClient.seed}&backgroundColor=transparent" class="w-full h-full object-cover">
+                </div>
+                <div class="${isError ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border-red-300 dark:border-red-800' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100'} border max-w-[85%] md:max-w-[75%] rounded-[18px] rounded-bl-sm px-4 py-3 shadow-sm text-[14px] leading-relaxed chat-bubble font-medium">
+                    ${htmlContent}
+                </div>
+            `;
+            chatMessagesEl.appendChild(wrapper); chatMessagesEl.scrollTo({top: 9999, behavior: 'smooth'});
+        }
+
+        const TYPING_ID = 'typing-indicator-node';
+        function showTypingIndicator() {
+            const wrapper = document.createElement('div'); wrapper.id = TYPING_ID; wrapper.className = `flex w-full justify-start mb-4 items-end`;
+            wrapper.innerHTML = `
+               <div class="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 mr-2 border border-slate-300 dark:border-slate-600 overflow-hidden shadow-sm shrink-0"><img src="https://api.dicebear.com/7.x/adventurer/svg?seed=${activeClient.seed}&backgroundColor=transparent" class="w-full h-full object-cover"></div>
+               <div class="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 border rounded-[18px] rounded-bl-sm px-4 py-3 shadow-sm flex items-center chat-bubble h-11"><div class="typing inline-flex gap-1"><span class="bg-slate-500 dark:bg-slate-400"></span><span class="bg-slate-500 dark:bg-slate-400"></span><span class="bg-slate-500 dark:bg-slate-400"></span></div></div>
+            `;
+            chatMessagesEl.appendChild(wrapper); chatMessagesEl.scrollTo({top: 9999, behavior: 'smooth'});
+        }
+        function removeTypingIndicator() { const el = document.getElementById(TYPING_ID); if(el) el.remove(); }
+        function escapeHTML(str) { return str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)); }
+        function downloadCSV(arr, fn) {
+            const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob(["\uFEFF" + arr.join('\r\n')], { type: 'text/csv;charset=utf-8;' }));
+            link.download = fn; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
